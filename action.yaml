@@ -18,6 +18,7 @@ runs:
   steps:
     - name: Set CC and CXX outputs
       id: set-outputs
+      shell: bash
       run: |
         switch ${{ inputs.target_arch }} in
           x86_64) exec_name_prefix=x86_64-linux-musl- ;;
@@ -30,6 +31,7 @@ runs:
         echo "CXX=/opt/musl-dyne/gcc-musl/bin/${exec_name_prefix}g++" >> $GITHUB_OUTPUT
     - name: Get SHA256 of dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz
       id: get-sum
+      shell: bash
       run: |
         curl -s "https://files.dyne.org/?file=musl/SHA256SUMS.txt" -o checksums.txt
         HASH=$(grep dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz checksums.txt | awk '{print $1}')
@@ -42,12 +44,14 @@ runs:
         key: musl-dyne-${{ steps.get-sum.outputs.hash }}
     - name: Copy to /opt/musl-dyne if cache hit
       if: steps.cache-musl.outputs.cache-hit == 'true'
+      shell: bash
       run: |
         sudo mkdir -p /opt/musl-dyne
         sudo rm -rf   /opt/musl-dyne/*
         sudo cp -a    .cache/musl-dyne/. /opt/musl-dyne/
     - name: Download and extract if cache miss
       if: steps.cache-musl.outputs.cache-hit != 'true'
+      shell: bash
       run: |
         wget -O dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz "https://files.dyne.org/?file=musl/dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz"
         mkdir -p .cache/musl-dyne
