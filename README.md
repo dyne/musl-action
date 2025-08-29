@@ -1,6 +1,17 @@
+
+<div align="center">
+
 # dyne/musl-action
 
-This action sets up dyne-gcc-musl toolchain for cross-compilation to your target architecture, caching it for performance.
+</div>
+
+<p align="center">
+  <a href="https://dyne.org/musl">
+    <img src="https://dyne.org/musl/musl-logo-infinity-optimized.svg" width="250">
+  </a>
+</p>
+
+This action sets up [dyne-gcc-musl](https://github.com/dyne/musl) toolchain for cross-compilation to your target architecture, caching it for performance.
 
 ## 🎮 Usage
 
