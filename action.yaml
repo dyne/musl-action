@@ -20,7 +20,7 @@ runs:
       id: set-outputs
       shell: bash
       run: |
-        switch ${{ inputs.target_arch }} in
+        case "${{ inputs.target_arch }}" in
           x86_64) exec_name_prefix=x86_64-linux-musl- ;;
           arm_64) exec_name_prefix=aarch64-linux-musl- ;;
           arm_hf) exec_name_prefix=arm-linux-musleabihf- ;;
