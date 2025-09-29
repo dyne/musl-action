@@ -27,8 +27,8 @@ runs:
           riscv_64) exec_name_prefix=riscv_64-linux-musl- ;;
           *) echo "Unsupported architecture: ${{ inputs.target_arch }}" ; exit 1 ;;
         esac
-        echo "CC=/opt/musl-dyne/gcc-musl/bin/${exec_name_prefix}gcc" >> $GITHUB_OUTPUT
-        echo "CXX=/opt/musl-dyne/gcc-musl/bin/${exec_name_prefix}g++" >> $GITHUB_OUTPUT
+        echo "CC=/opt/dyne/gcc-musl/bin/${exec_name_prefix}gcc" >> $GITHUB_OUTPUT
+        echo "CXX=/opt/dyne/gcc-musl/bin/${exec_name_prefix}g++" >> $GITHUB_OUTPUT
     - name: Get SHA256 of dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz
       id: get-sum
       shell: bash
@@ -42,20 +42,20 @@ runs:
       with:
         path: .cache/musl-dyne
         key: musl-dyne-${{ steps.get-sum.outputs.hash }}
-    - name: Copy to /opt/musl-dyne if cache hit
+    - name: Copy to /opt/dyne/ if cache hit
       if: steps.cache-musl.outputs.cache-hit == 'true'
       shell: bash
       run: |
-        sudo mkdir -p /opt/musl-dyne
-        sudo rm -rf   /opt/musl-dyne/*
-        sudo cp -a    .cache/musl-dyne/. /opt/musl-dyne/
+        sudo mkdir -p /opt/dyne
+        sudo rm -rf   /opt/dyne/*-musl
+        sudo cp -a    .cache/musl-dyne/. /opt/dyne/
     - name: Download and extract if cache miss
       if: steps.cache-musl.outputs.cache-hit != 'true'
       shell: bash
       run: |
         wget -O dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz "https://files.dyne.org/?file=musl/dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz"
-        mkdir -p .cache/musl-dyne
+        mkdir -p .cache/dyne
         tar -xJf dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz -C .cache/musl-dyne --strip-components=1
         rm dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz
-        sudo rm -rf /opt/musl-dyne/*
-        sudo cp -a .cache/musl-dyne/. /opt/musl-dyne/
+        sudo rm -rf /opt/dyne/*-musl
+        sudo cp -a .cache/musl-dyne/. /opt/dyne/
