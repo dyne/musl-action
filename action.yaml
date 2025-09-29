@@ -60,6 +60,7 @@ runs:
         sudo rm -rf /opt/dyne/*-musl
         sudo cp -a .cache/musl-dyne/. /opt/dyne/
     - name: Update PATH to use dyne musl
+      shell: bash
       run: |
         case "${{ inputs.target_arch }}" in
           x86_64) exec_prefix=x86_64-linux-musl ;;
