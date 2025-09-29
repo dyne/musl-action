@@ -54,7 +54,7 @@ runs:
       shell: bash
       run: |
         wget -O dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz "https://files.dyne.org/?file=musl/dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz"
-        mkdir -p .cache/dyne
+        mkdir -p .cache/musl-dyne
         tar -xJf dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz -C .cache/musl-dyne --strip-components=1
         rm dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz
         sudo rm -rf /opt/dyne/*-musl
