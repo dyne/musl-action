@@ -62,12 +62,4 @@ runs:
     - name: Update PATH to use dyne musl
       shell: bash
       run: |
-        case "${{ inputs.target_arch }}" in
-          x86_64) exec_prefix=x86_64-linux-musl ;;
-          arm_64) exec_prefix=aarch64-linux-musl ;;
-          arm_hf) exec_prefix=arm-linux-musleabihf ;;
-          riscv_64) exec_prefix=riscv_64-linux-musl ;;
-          *) echo "Unsupported architecture: ${{ inputs.target_arch }}" ; exit 1 ;;
-        esac
         echo "/opt/dyne/gcc-musl/bin" >> $GITHUB_PATH
-        echo "/opt/dyne/${exec_prefix}/bin" >> $GITHUB_PATH
