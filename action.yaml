@@ -33,7 +33,7 @@ runs:
       id: get-sum
       shell: bash
       run: |
-        curl -s "https://files.dyne.org/?file=musl/SHA256SUMS.txt" -o checksums.txt
+        curl -s "https://files.dyne.org/musl/SHA256SUMS.txt" -o checksums.txt
         HASH=$(grep dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz checksums.txt | awk '{print $1}')
         echo "hash=$HASH" >> $GITHUB_OUTPUT
     - name: Cache musl-dyne using SHA256
@@ -53,7 +53,7 @@ runs:
       if: steps.cache-musl.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        wget -q -O dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz "https://files.dyne.org/?file=musl/dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz"
+        wget -q -O dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz "https://files.dyne.org/musl/dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz"
         mkdir -p .cache/musl-dyne
         tar -xJf dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz -C .cache/musl-dyne --strip-components=1
         rm dyne-gcc-musl-${{ inputs.target_arch }}.tar.xz
