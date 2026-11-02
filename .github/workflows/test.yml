@@ -1,0 +1,64 @@
+name: Installer and published toolchain consumers
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Optional exact dyne/musl release tag to test
+        type: string
+        required: false
+  schedule:
+    - cron: '17 6 * * 1'
+permissions:
+  contents: read
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Offline installer regressions
+        run: python3 -m unittest discover -s tests -v
+  consumer:
+    needs: regression
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        target: [x86_64, arm_64, arm_hf, riscv_64]
+        version: [v2.5.0, latest]
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install host consumer tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake pkgconf ccache
+      - name: Install selected release
+        uses: ./
+        id: first
+        with:
+          target_arch: ${{ matrix.target }}
+          version: ${{ inputs.version || matrix.version }}
+      - name: Restore and verify the same release again
+        uses: ./
+        id: warm
+        with:
+          target_arch: ${{ matrix.target }}
+          version: ${{ steps.first.outputs.version }}
+          sha256: ${{ steps.first.outputs.sha256 }}
+      - name: Check warm cache and relocated static C++ consumers
+        env:
+          CC: ${{ steps.warm.outputs.CC }}
+          TARGET: ${{ matrix.target }}
+          CACHE_HIT: ${{ steps.warm.outputs.cache-hit }}
+          VERSION: ${{ steps.warm.outputs.version }}
+          DIGEST: ${{ steps.warm.outputs.sha256 }}
+        run: |
+          test "$CACHE_HIT" = true
+          prefix=$(dirname "$(dirname "$(dirname "$CC")")")
+          moved="$prefix-relocated"
+          mv "$prefix" "$moved"
+          python3 tests/smoke.py --root "$moved" --target "$TARGET"
+          printf 'Release: %s\nTarget: %s\nSHA256: %s\nAction: %s\n' \
+            "$VERSION" "$TARGET" "$DIGEST" "$GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
